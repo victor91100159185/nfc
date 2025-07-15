@@ -1,66 +1,76 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Escáner NFC</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Escáner NFC - Redirección</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
       padding: 50px;
-      background: #f0f0f0;
+      background: #eaf6ff;
     }
     button {
       font-size: 20px;
       padding: 10px 30px;
-      margin-top: 20px;
+      background-color: #009688;
+      color: white;
+      border: none;
+      border-radius: 5px;
       cursor: pointer;
     }
     #output {
       margin-top: 30px;
       font-size: 18px;
-      color: #333;
-      background: #fff;
+      background: #ffffff;
       padding: 20px;
-      border-radius: 8px;
+      border-radius: 10px;
       display: inline-block;
+      color: #333;
     }
   </style>
 </head>
 <body>
 
-  <h1>Escáner de Tag NFC</h1>
-  <p>Haz clic en el botón y acerca una etiqueta NFC</p>
+  <h1>Escanea el Tag NFC de tu Mascota</h1>
+  <p>Acerca la etiqueta NFC para ver su información</p>
   <button onclick="leerNFC()">Escanear NFC</button>
 
   <div id="output">Esperando escaneo...</div>
 
   <script>
     async function leerNFC() {
+      const output = document.getElementById("output");
+
       if ("NDEFReader" in window) {
         try {
           const ndef = new NDEFReader();
           await ndef.scan();
-          document.getElementById("output").textContent = "Escaneando... acerca la etiqueta NFC";
+          output.textContent = "Escaneando... acerca el tag NFC";
 
           ndef.onreading = event => {
-            const { serialNumber, message } = event;
-            let result = `Tag detectado:\nID: ${serialNumber}\n`;
-
-            for (const record of message.records) {
+            for (const record of event.message.records) {
               const textDecoder = new TextDecoder(record.encoding || "utf-8");
               const data = textDecoder.decode(record.data);
-              result += `Tipo: ${record.recordType}\nContenido: ${data}\n`;
-            }
 
-            document.getElementById("output").textContent = result;
+              output.textContent = `Redirigiendo a: ${data}`;
+
+              // Redirigir automáticamente si es una URL válida
+              if (data.startsWith("http://") || data.startsWith("https://")) {
+                setTimeout(() => {
+                  window.location.href = data;
+                }, 1500); // Esperar 1.5 segundos antes de redirigir
+              } else {
+                output.textContent = `Contenido NFC no es una URL válida: ${data}`;
+              }
+            }
           };
         } catch (error) {
-          document.getElementById("output").textContent = `Error al leer NFC: ${error}`;
+          output.textContent = `Error al leer NFC: ${error}`;
         }
       } else {
-        document.getElementById("output").textContent = "Tu navegador no soporta NFC Web API.";
+        output.textContent = "Este navegador no soporta lectura NFC.";
       }
     }
   </script>
