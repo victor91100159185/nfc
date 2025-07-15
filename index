@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Escáner NFC</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px;
+      background: #f0f0f0;
+    }
+    button {
+      font-size: 20px;
+      padding: 10px 30px;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+    #output {
+      margin-top: 30px;
+      font-size: 18px;
+      color: #333;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Escáner de Tag NFC</h1>
+  <p>Haz clic en el botón y acerca una etiqueta NFC</p>
+  <button onclick="leerNFC()">Escanear NFC</button>
+
+  <div id="output">Esperando escaneo...</div>
+
+  <script>
+    async function leerNFC() {
+      if ("NDEFReader" in window) {
+        try {
+          const ndef = new NDEFReader();
+          await ndef.scan();
+          document.getElementById("output").textContent = "Escaneando... acerca la etiqueta NFC";
+
+          ndef.onreading = event => {
+            const { serialNumber, message } = event;
+            let result = `Tag detectado:\nID: ${serialNumber}\n`;
+
+            for (const record of message.records) {
+              const textDecoder = new Tex
