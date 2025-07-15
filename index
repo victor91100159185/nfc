@@ -49,4 +49,21 @@
             let result = `Tag detectado:\nID: ${serialNumber}\n`;
 
             for (const record of message.records) {
-              const textDecoder = new Tex
+              const textDecoder = new TextDecoder(record.encoding || "utf-8");
+              const data = textDecoder.decode(record.data);
+              result += `Tipo: ${record.recordType}\nContenido: ${data}\n`;
+            }
+
+            document.getElementById("output").textContent = result;
+          };
+        } catch (error) {
+          document.getElementById("output").textContent = `Error al leer NFC: ${error}`;
+        }
+      } else {
+        document.getElementById("output").textContent = "Tu navegador no soporta NFC Web API.";
+      }
+    }
+  </script>
+
+</body>
+</html>
